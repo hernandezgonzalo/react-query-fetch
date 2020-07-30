@@ -1,15 +1,35 @@
 import React, { useState } from "react";
-import PageOne from "./PageOne";
-import PageTwo from "./PageTwo";
+import { useQuery } from "react-query";
+import { getNews } from "./services/news.api";
+import NewsCard from "./components/newsCard";
+import "./main.css";
 
 export default function App() {
-  const [view, setView] = useState(1);
+  const [page, setPage] = useState(1);
+  const { isLoading, isError, data } = useQuery(["getNews", page], getNews);
 
   return (
-    <>
-      <button onClick={() => setView(1)}>Page 1</button>
-      <button onClick={() => setView(2)}>Page 2</button>
-      {view === 1 ? <PageOne /> : <PageTwo />}
-    </>
+    <div className="container">
+      <div className="row">
+        <div className="col text-center">
+          <button className="btn btn-primary mr-1" onClick={() => setPage(1)}>
+            Page 1
+          </button>
+          <button className="btn btn-primary" onClick={() => setPage(2)}>
+            Page 2
+          </button>
+        </div>
+      </div>
+
+      {isLoading && <p>Loading...</p>}
+
+      {isError && <p>An error has occurred</p>}
+
+      <div className="row mx-1 my-2">
+        {data?.map((article, index) => (
+          <NewsCard key={index} article={article} />
+        ))}
+      </div>
+    </div>
   );
 }
